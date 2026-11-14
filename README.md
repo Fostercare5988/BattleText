@@ -10,9 +10,9 @@ heals, misses, absorbs, critical hits, resource gains and configurable alerts.
 
 ## Install or update
 
-1. With WoW closed, click **Code > Download ZIP** on this page.
-2. Extract it into `Interface/AddOns` and rename the folder to
-   **FostercareBattleText**, so the TOC is at
+1. With WoW closed, download `FostercareBattleText.zip` from the
+   [latest release](https://github.com/Fostercare5988/FostercareBattleText/releases/latest).
+2. Extract it into `Interface/AddOns`, so the TOC is at
    `Interface/AddOns/FostercareBattleText/FostercareBattleText.toc`.
 
 
