@@ -29,9 +29,6 @@ local NUM_FONT_STRINGS, FIRST_STICKY = 20, 11
 local MIN_VERTICAL_SPACING = 8
 -- Incoming and outgoing events wait this long so that like events merge.
 local MERGE_DELAY_TIME = 0.3
--- Ticks of damage and healing over time and power gains wait this long, as
--- modern MSBT's dot, hot and powerThrottleDuration (3 s).
-local THROTTLE_TIME = 3
 local STICKY_FADE_IN_TIME, STICKY_DISPLAY_TIME, STICKY_FADE_OUT_TIME = 0.15, 2, 0.5
 -- Scrolling text moves at most this often; each step scales with the time passed.
 local ANIMATION_SPEED = 0.02
@@ -101,8 +98,6 @@ local NOTICE_KEYS = {
 local CP_FULL_KEY = "MSBT_EVENTTYPE_NOTIFICATION_CP_FULL"
 
 local meleeKeys, spellKeys, healKeys = {}, {}, {}
--- The event types that wait THROTTLE_TIME.
-local THROTTLED = {MSBT_EVENTTYPE_NOTIFICATION_POWER_GAIN = true}
 do
  local suffixes = {"DAMAGE", "DOT", "MISS", "DODGE", "PARRY", "BLOCK", "RESIST", "ABSORB", "IMMUNE", "EVADE", "REFLECT", "ENVIRONMENTAL"}
  for direction, prefix in pairs(PREFIXES) do
@@ -123,9 +118,6 @@ do
  meleeKeys[pet].REFLECT, spellKeys[pet].REFLECT = "MSBT_EVENTTYPE_OUTGOING_SPELL_REFLECT", "MSBT_EVENTTYPE_OUTGOING_SPELL_REFLECT"
  healKeys[pet] = {HEAL = "MSBT_EVENTTYPE_OUTGOING_HEAL", HOT = "MSBT_EVENTTYPE_OUTGOING_HOT"}
  for notificationType, suffix in pairs(NOTICE_KEYS) do NOTICE_KEYS[notificationType] = "MSBT_EVENTTYPE_NOTIFICATION_" .. suffix end
- for direction in pairs(PREFIXES) do
-  THROTTLED[spellKeys[direction].DOT], THROTTLED[healKeys[direction].HOT] = true, true
- end
 end
 
 -------------------------------------------------------------------------------------
@@ -136,12 +128,13 @@ end
 local scrollAreas = {}
 FBT.scrollAreas = scrollAreas
 
--- Incoming and outgoing events wait in these queues to merge, and throttled
--- events in their own, per area.
-local function Queue(delay) return {Generation = 0, Delay = delay, Unmerged = {}, Spare = {}, Merged = {}} end
-local mergeQueues = {Incoming = Queue(MERGE_DELAY_TIME), Outgoing = Queue(MERGE_DELAY_TIME)}
-local throttleQueues = {Incoming = Queue(THROTTLE_TIME), Outgoing = Queue(THROTTLE_TIME), Notification = Queue(THROTTLE_TIME)}
-local allQueues = {mergeQueues.Incoming, mergeQueues.Outgoing, throttleQueues.Incoming, throttleQueues.Outgoing, throttleQueues.Notification}
+-- Incoming and outgoing events wait in these queues to merge. Every tick of
+-- damage and healing over time and every power gain shows on its own: the
+-- 3 s throttle of 2.3.0 was taken out (players, 2026-11-16).
+local mergeQueues = {
+ Incoming = {Generation = 0, Unmerged = {}, Spare = {}, Merged = {}},
+ Outgoing = {Generation = 0, Unmerged = {}, Spare = {}, Merged = {}},
+}
 
 local activeNonStickies, activeStickies = {}, {}
 
@@ -261,8 +254,7 @@ end
 -------------------------------------------------------------------------------------
 
 -- Merges `count` events of `unmerged` into queue.Merged; spell events on several
--- targets become "Multiple", melee events merge per target, and notices with
--- no unit (power gains) merge with each other.
+-- targets become "Multiple", melee events merge per target.
 function FBT.MergeEvents(queue, unmerged, count)
  local merged = queue.Merged
  for x = 1, count do
@@ -276,7 +268,7 @@ function FBT.MergeEvents(queue, unmerged, count)
      end
      into = candidate
     elseif (event.UnitGUID and event.UnitGUID == candidate.UnitGUID) or
-           (not event.UnitGUID and not candidate.UnitGUID and event.Name == candidate.Name) then
+           (not event.UnitGUID and not candidate.UnitGUID and event.Name ~= nil and event.Name == candidate.Name) then
      into = candidate
     end
    end
@@ -312,7 +304,7 @@ local function ReclaimAll(list)
 end
 
 function FBT.ClearPendingEvents()
- for _, queue in ipairs(allQueues) do
+ for _, queue in pairs(mergeQueues) do
   queue.Generation = queue.Generation + 1
   if queue.Timer then queue.Timer:Cancel(); queue.Timer = nil end
   queue.TimerPending = false
@@ -351,17 +343,16 @@ ScheduleMerge = function(queue)
  if queue.TimerPending then return end
  queue.TimerPending = true
  local generation = queue.Generation
- queue.Timer = C_Timer.NewTimer(queue.Delay, function()
+ queue.Timer = C_Timer.NewTimer(MERGE_DELAY_TIME, function()
   if queue.Generation == generation then ProcessMerge(queue) end
  end)
 end
 
--- Incoming and outgoing events wait to merge, throttled events longer; other
--- notices show at once.
+-- Incoming and outgoing events wait to merge; notices show at once.
 function FBT.DispatchAnimationEvent(message)
  local area = message.ScrollArea
  if not (message.EventSettings.Show and area.DisplaySettings.Show) then return Reclaim(message) end
- local queue = (THROTTLED[message.EventType] and throttleQueues or mergeQueues)[area.Name]
+ local queue = mergeQueues[area.Name]
  if queue then
   table_insert(queue.Unmerged, message)
   ScheduleMerge(queue)
