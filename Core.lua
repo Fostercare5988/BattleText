@@ -70,10 +70,10 @@ local RESIST_SOUND_SPELLS = {["Cone of Cold"] = true, ["Frost Nova"] = true}
 
 -- Event type keys, built once: [direction][suffix] for melee and for spells.
 local PREFIXES = {
- [Combat.DIRECTIONTYPE_PLAYER_INCOMING] = "MSBT_EVENTTYPE_INCOMING_",
- [Combat.DIRECTIONTYPE_PLAYER_OUTGOING] = "MSBT_EVENTTYPE_OUTGOING_",
- [Combat.DIRECTIONTYPE_PET_OUTGOING] = "MSBT_EVENTTYPE_OUTGOING_PET_",
- [Combat.DIRECTIONTYPE_PET_INCOMING] = "MSBT_EVENTTYPE_INCOMING_PET_",
+ [Combat.DIRECTIONTYPE_PLAYER_INCOMING] = "EVENTTYPE_INCOMING_",
+ [Combat.DIRECTIONTYPE_PLAYER_OUTGOING] = "EVENTTYPE_OUTGOING_",
+ [Combat.DIRECTIONTYPE_PET_OUTGOING] = "EVENTTYPE_OUTGOING_PET_",
+ [Combat.DIRECTIONTYPE_PET_INCOMING] = "EVENTTYPE_INCOMING_PET_",
 }
 local AREA_OF = {
  [Combat.DIRECTIONTYPE_PLAYER_INCOMING] = "Incoming", [Combat.DIRECTIONTYPE_PET_INCOMING] = "Incoming",
@@ -95,7 +95,7 @@ local NOTICE_KEYS = {
  [Combat.NOTIFICATIONTYPE_PC_KILLING_BLOW] = "PC_KILLING_BLOW", [Combat.NOTIFICATIONTYPE_NPC_KILLING_BLOW] = "NPC_KILLING_BLOW",
  [Combat.NOTIFICATIONTYPE_DEBUFF_STACK] = "DEBUFF_STACK", [Combat.NOTIFICATIONTYPE_BUFF_STACK] = "BUFF_STACK",
 }
-local CP_FULL_KEY = "MSBT_EVENTTYPE_NOTIFICATION_CP_FULL"
+local CP_FULL_KEY = "EVENTTYPE_NOTIFICATION_CP_FULL"
 
 local meleeKeys, spellKeys, healKeys = {}, {}, {}
 do
@@ -114,10 +114,10 @@ do
  end
  -- Your pet's over-time damage, reflects and heals show as yours.
  local pet = Combat.DIRECTIONTYPE_PET_OUTGOING
- meleeKeys[pet].DOT, spellKeys[pet].DOT = "MSBT_EVENTTYPE_OUTGOING_SPELL_DOT", "MSBT_EVENTTYPE_OUTGOING_SPELL_DOT"
- meleeKeys[pet].REFLECT, spellKeys[pet].REFLECT = "MSBT_EVENTTYPE_OUTGOING_SPELL_REFLECT", "MSBT_EVENTTYPE_OUTGOING_SPELL_REFLECT"
- healKeys[pet] = {HEAL = "MSBT_EVENTTYPE_OUTGOING_HEAL", HOT = "MSBT_EVENTTYPE_OUTGOING_HOT"}
- for notificationType, suffix in pairs(NOTICE_KEYS) do NOTICE_KEYS[notificationType] = "MSBT_EVENTTYPE_NOTIFICATION_" .. suffix end
+ meleeKeys[pet].DOT, spellKeys[pet].DOT = "EVENTTYPE_OUTGOING_SPELL_DOT", "EVENTTYPE_OUTGOING_SPELL_DOT"
+ meleeKeys[pet].REFLECT, spellKeys[pet].REFLECT = "EVENTTYPE_OUTGOING_SPELL_REFLECT", "EVENTTYPE_OUTGOING_SPELL_REFLECT"
+ healKeys[pet] = {HEAL = "EVENTTYPE_OUTGOING_HEAL", HOT = "EVENTTYPE_OUTGOING_HOT"}
+ for notificationType, suffix in pairs(NOTICE_KEYS) do NOTICE_KEYS[notificationType] = "EVENTTYPE_NOTIFICATION_" .. suffix end
 end
 
 -------------------------------------------------------------------------------------
@@ -552,7 +552,7 @@ function FBT.AddAnimation(message)
  slot.IsCrit, slot.IsSticky = message.IsCrit, sticky
  slot.IconScale, slot.IconFull, slot.IconTint = message.IconScale or 1, message.IconFull, message.IconTint
 
- if message.EventType == "MSBT_EVENTTYPE_OUTGOING_SPELL_RESIST" and profile.ResistSound and RESIST_SOUND_SPELLS[message.EffectName] then
+ if message.EventType == "EVENTTYPE_OUTGOING_SPELL_RESIST" and profile.ResistSound and RESIST_SOUND_SPELLS[message.EffectName] then
   PlaySoundFile(FBT.MEDIA .. "sounds\\Resist.mp3")
  end
 
@@ -829,7 +829,7 @@ local function FilterGroups(profile)
  if type(profile.FilterGroups) == "table" or type(profile.Suppressions) ~= "table" then return end
  profile.FilterGroups = {{Name = FBT.TOTEM_FILTER_GROUP}}
  for key, filter in pairs(profile.Suppressions) do
-  if string_find(key, "^MSBT_SUPPRESSION_SHAMAN_") then filter.Group = FBT.TOTEM_FILTER_GROUP end
+  if string_find(key, "^SUPPRESSION_SHAMAN_") then filter.Group = FBT.TOTEM_FILTER_GROUP end
  end
 end
 
@@ -969,7 +969,7 @@ loader:SetScript("OnEvent", function()
 end)
 
 -------------------------------------------------------------------------------------
--- Slash command: /fbt (and /msbt, the old name).
+-- Slash command: /fbt.
 -------------------------------------------------------------------------------------
 
 local COMMANDS = {
@@ -979,7 +979,7 @@ local COMMANDS = {
  version = function() FBT.Print("v" .. FBT.VERSION, 1, 1, 1) end,
 }
 
-SLASH_BATTLETEXT1, SLASH_BATTLETEXT2 = "/fbt", "/msbt"
+SLASH_BATTLETEXT1 = "/fbt"
 SlashCmdList.BATTLETEXT = function(text)
  local command = string.lower(string.match(text or "", "^%s*(%S*)"))
  if command == "" then return FBT.Options.Toggle() end
@@ -994,8 +994,8 @@ end
 local function Channel(value) return (value and value >= 0 and value <= 255) and value / 255 or 1 end
 
 -- message, display type (FBT.DISPLAYTYPE_*), sticky, colour as 0-255 channels,
--- font size, font name, outline index and an icon path, in the order of
--- MikSBT.DisplayMessage; all but the message are optional.
+-- font size, font name, outline index and an icon path, in that order;
+-- all but the message are optional.
 function FBT.DisplayMessage(message, displayType, isSticky, colorR, colorG, colorB, fontSize, fontName, outlineIndex, texture)
  if message == nil or Disabled() then return end
  local area = displayType == FBT.DISPLAYTYPE_INCOMING and scrollAreas.Incoming

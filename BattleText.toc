@@ -1,9 +1,9 @@
 ## Interface: 11200
 ## Title: |cffff9e38BattleText|r |cffffd6a8[Fostercare5988]|r
-## Notes: Scrolling combat text from ClassicAPI's combat log. Formerly Mik's Scrolling Battle Text.
-## Author: Mik, Fostercare5988
+## Notes: Scrolling combat text from ClassicAPI's combat log.
+## Author: Fostercare5988
 ## X-Maintainer: Fostercare5988
-## Version: 2.4.2
+## Version: 2.4.3
 ## SavedVariables: BattleTextDB
 ## SavedVariablesPerCharacter: BattleTextCharDB
 ## X-Category: Combat

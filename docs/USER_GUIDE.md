@@ -1,6 +1,6 @@
 # BattleText user guide
 
-Type `/fbt` to open the settings (`/msbt` still works). The tabs are **General,
+Type `/fbt` to open the settings. The tabs are **General,
 Areas, Incoming, Outgoing, Notices, Triggers, Filters and Profiles**. Every
 change applies at once and is saved when you log out or reload. The close button or Escape closes the window.
 
