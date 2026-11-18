@@ -6,7 +6,7 @@ heals, misses, absorbs, critical hits, resource gains and configurable alerts.
 ## Requirements
 
 - World of Warcraft 1.12.1 (build 5875).
-- ClassicAPI.
+- [ClassicAPI](https://github.com/brues-code/ClassicAPI).
 
 ## Install or update
 
