@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------------
--- FostercareBattleText: combat events and triggers.
+-- BattleText: combat events and triggers.
 -- Everything in combat comes from ClassicAPI's combat log, filtered by the
 -- engine to you and your pet; honor and skill gains, which have no structured
 -- event, from their chat line.

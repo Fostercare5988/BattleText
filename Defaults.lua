@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------------
--- FostercareBattleText: namespace, constants and the default profile.
+-- BattleText: namespace, constants and the default profile.
 -- Formerly Mik's Scrolling Battle Text (Mik); maintained by Fostercare5988.
 -------------------------------------------------------------------------------------
 
@@ -8,13 +8,13 @@ local addonName, FBT = ...
 -- Runs on ClassicAPI (combat log, GetSpellInfo, UnitGUID, unit events). The
 -- other files load only when FBT.ready is set here.
 if type(CLASSIC_API_VERSION) ~= "number" then
- DEFAULT_CHAT_FRAME:AddMessage("|cffff2020FBT:|r FostercareBattleText needs ClassicAPI. Update it and restart the game.", 1, 0.2, 0.2)
+ DEFAULT_CHAT_FRAME:AddMessage("|cffff2020FBT:|r BattleText needs ClassicAPI. Update it and restart the game.", 1, 0.2, 0.2)
  return
 end
 FBT.ready = true
 
--- The one public table. Other addons call FostercareBattleText.DisplayMessage.
-FostercareBattleText = FBT
+-- The one public table. Other addons call BattleText.DisplayMessage.
+BattleText = FBT
 
 FBT.VERSION = GetAddOnMetadata(addonName, "Version")
 FBT.MEDIA = "Interface\\AddOns\\" .. addonName .. "\\"

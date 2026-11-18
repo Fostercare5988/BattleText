@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------------
--- FostercareBattleText: profiles, merging and the scroll areas.
+-- BattleText: profiles, merging and the scroll areas.
 -------------------------------------------------------------------------------------
 
 local addonName, FBT = ...
@@ -170,7 +170,7 @@ end
 -------------------------------------------------------------------------------------
 
 local function Disabled()
- return not FBT.CurrentProfile or FostercareBattleTextDB.UserDisabled
+ return not FBT.CurrentProfile or BattleTextDB.UserDisabled
 end
 
 -- The settings key of a combat event.
@@ -774,12 +774,12 @@ end
 
 -- The name of the profile this character uses.
 function FBT.CurrentProfileName()
- return FostercareBattleTextCharDB.CurrentProfile
+ return BattleTextCharDB.CurrentProfile
 end
 
 -- Points everything at this character's profile.
 local function UseProfile()
- FBT.CurrentProfile = FostercareBattleTextDB.Profiles[FBT.CurrentProfileName()]
+ FBT.CurrentProfile = BattleTextDB.Profiles[FBT.CurrentProfileName()]
  for name, area in pairs(scrollAreas) do area.DisplaySettings = FBT.CurrentProfile.DisplaySettings[name] end
  FBT.RepositionAnimationFrames()
  FBT.RegisterTriggers()
@@ -844,8 +844,8 @@ local function FillMissing(target, defaults)
  end
 end
 function FBT.UpdateProfiles()
- Sweep(FostercareBattleTextDB, DB_KEYS, false)
- for _, profile in pairs(FostercareBattleTextDB.Profiles) do
+ Sweep(BattleTextDB, DB_KEYS, false)
+ for _, profile in pairs(BattleTextDB.Profiles) do
   if type(profile) == "table" then
    FontNames(profile)
    FilterGroups(profile)
@@ -856,14 +856,14 @@ function FBT.UpdateProfiles()
 end
 
 function FBT.ProfileExists(name)
- return name ~= nil and FostercareBattleTextDB.Profiles[name] ~= nil
+ return name ~= nil and BattleTextDB.Profiles[name] ~= nil
 end
 
 function FBT.ResetProfile(name, showOutput)
  if not FBT.ProfileExists(name) then return end
  local current = name == FBT.CurrentProfileName()
  if current then FBT.ClearPendingEvents() end
- FostercareBattleTextDB.Profiles[name] = FBT.CopyTable(FBT.DEFAULT_CONFIG)
+ BattleTextDB.Profiles[name] = FBT.CopyTable(FBT.DEFAULT_CONFIG)
  if current then UseProfile() end
  if showOutput then FBT.Print(name .. " profile reset.", 0, 1, 0) end
 end
@@ -871,14 +871,14 @@ end
 function FBT.SelectProfile(name)
  if not FBT.ProfileExists(name) then return end
  FBT.ClearPendingEvents()
- FostercareBattleTextCharDB.CurrentProfile = name
+ BattleTextCharDB.CurrentProfile = name
  UseProfile()
 end
 
 -- A new profile from the defaults, or a copy of the profile `from`.
 function FBT.CreateProfile(name, from)
  if name == nil or name == "" or FBT.ProfileExists(name) then return end
- local profiles = FostercareBattleTextDB.Profiles
+ local profiles = BattleTextDB.Profiles
  profiles[name] = FBT.CopyTable(from and profiles[from] or FBT.DEFAULT_CONFIG)
  return true
 end
@@ -887,18 +887,18 @@ end
 -- character that used the old name follows it at its next login (Init).
 function FBT.RenameProfile(old, new)
  if old == FBT.DEFAULT_PROFILE_NAME or not FBT.ProfileExists(old) or new == nil or new == "" or FBT.ProfileExists(new) then return end
- local db = FostercareBattleTextDB
+ local db = BattleTextDB
  db.Profiles[new], db.Profiles[old] = db.Profiles[old], nil
  db.Renamed = db.Renamed or {}
  db.Renamed[old] = new
- if FostercareBattleTextCharDB.CurrentProfile == old then FostercareBattleTextCharDB.CurrentProfile = new end
+ if BattleTextCharDB.CurrentProfile == old then BattleTextCharDB.CurrentProfile = new end
  return true
 end
 
 function FBT.DeleteProfile(name)
  if name == FBT.DEFAULT_PROFILE_NAME or not FBT.ProfileExists(name) then return end
  if name == FBT.CurrentProfileName() then FBT.SelectProfile(FBT.DEFAULT_PROFILE_NAME) end
- FostercareBattleTextDB.Profiles[name] = nil
+ BattleTextDB.Profiles[name] = nil
 end
 
 -------------------------------------------------------------------------------------
@@ -908,7 +908,7 @@ end
 -- The game's own damage numbers: back on while the addon is off, otherwise the
 -- player's choice.
 function FBT.ApplyGameDamageSetting()
- SetCVar("CombatDamage", (FostercareBattleTextDB.UserDisabled or FBT.CurrentProfile.ShowGameDamage) and 1 or 0)
+ SetCVar("CombatDamage", (BattleTextDB.UserDisabled or FBT.CurrentProfile.ShowGameDamage) and 1 or 0)
 end
 
 function FBT.SetOptionShowGameDamage(show)
@@ -917,7 +917,7 @@ function FBT.SetOptionShowGameDamage(show)
 end
 
 function FBT.SetOptionUserDisabled(disabled)
- FostercareBattleTextDB.UserDisabled = disabled
+ BattleTextDB.UserDisabled = disabled
  if disabled then
   FBT.ClearPendingEvents()
   Combat.UnregisterEvents()
@@ -932,11 +932,11 @@ end
 -------------------------------------------------------------------------------------
 
 local function Init()
- local db = FostercareBattleTextDB
- if type(db) ~= "table" then db = {UserDisabled = false}; FostercareBattleTextDB = db end
+ local db = BattleTextDB
+ if type(db) ~= "table" then db = {UserDisabled = false}; BattleTextDB = db end
  if type(db.Profiles) ~= "table" then db.Profiles = {} end
- local char = FostercareBattleTextCharDB
- if type(char) ~= "table" then char = {}; FostercareBattleTextCharDB = char end
+ local char = BattleTextCharDB
+ if type(char) ~= "table" then char = {}; BattleTextCharDB = char end
  -- 2.1.0 saved one choice for the account: it becomes this character's.
  -- Both saved files held "Default" on 2026-11-13, so other characters lose nothing.
  char.CurrentProfile = char.CurrentProfile or db.CurrentProfile
@@ -979,8 +979,8 @@ local COMMANDS = {
  version = function() FBT.Print("v" .. FBT.VERSION, 1, 1, 1) end,
 }
 
-SLASH_FOSTERCAREBATTLETEXT1, SLASH_FOSTERCAREBATTLETEXT2 = "/fbt", "/msbt"
-SlashCmdList.FOSTERCAREBATTLETEXT = function(text)
+SLASH_BATTLETEXT1, SLASH_BATTLETEXT2 = "/fbt", "/msbt"
+SlashCmdList.BATTLETEXT = function(text)
  local command = string.lower(string.match(text or "", "^%s*(%S*)"))
  if command == "" then return FBT.Options.Toggle() end
  if COMMANDS[command] then return COMMANDS[command]() end
@@ -988,7 +988,7 @@ SlashCmdList.FOSTERCAREBATTLETEXT = function(text)
 end
 
 -------------------------------------------------------------------------------------
--- Public: other addons show text with FostercareBattleText.DisplayMessage.
+-- Public: other addons show text with BattleText.DisplayMessage.
 -------------------------------------------------------------------------------------
 
 local function Channel(value) return (value and value >= 0 and value <= 255) and value / 255 or 1 end

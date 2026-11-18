@@ -1,10 +1,10 @@
-# FostercareBattleText user guide
+# BattleText user guide
 
 Type `/fbt` to open the settings (`/msbt` still works). The tabs are **General,
 Areas, Incoming, Outgoing, Notices, Triggers, Filters and Profiles**. Every
 change applies at once and is saved when you log out or reload. The close button or Escape closes the window.
 
-The same eight pages are under **FostercareBattleText** in Game Menu > AddOn
+The same eight pages are under **BattleText** in Game Menu > AddOn
 Options, one column each; scroll down for the rest of a page. Its first entry
 opens the window. Opening the window closes AddOn Options, and a page shows in
 one place at a time.
@@ -101,7 +101,7 @@ renamed or deleted: copy it to make one you can.
 
 `/fbt`, `/fbt enable`, `/fbt disable`, `/fbt version`, `/fbt reset`.
 
-Other addons can send text through `FostercareBattleText.DisplayMessage`. The
+Other addons can send text through `BattleText.DisplayMessage`. The
 battle text leaves other addons' floating text and settings alone.
 
 Requirements: ClassicAPI. SuperWoW, NamPower and UnitXP are not needed.

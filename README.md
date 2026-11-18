@@ -1,4 +1,4 @@
-# FostercareBattleText
+# BattleText
 
 Scrolling combat text for World of Warcraft 1.12.1: player and pet damage,
 heals, misses, absorbs, critical hits, resource gains and configurable alerts.
@@ -10,17 +10,17 @@ heals, misses, absorbs, critical hits, resource gains and configurable alerts.
 
 ## Install or update
 
-1. With WoW closed, download `FostercareBattleText.zip` from the
-   [latest release](https://github.com/Fostercare5988/FostercareBattleText/releases/latest).
+1. With WoW closed, download `BattleText.zip` from the
+   [latest release](https://github.com/Fostercare5988/BattleText/releases/latest).
 2. Extract it into `Interface/AddOns`, so the TOC is at
-   `Interface/AddOns/FostercareBattleText/FostercareBattleText.toc`.
+   `Interface/AddOns/BattleText/BattleText.toc`.
 
 
 ## Configure
 
 Type `/fbt`. The tabs are General, Areas, Incoming,
 Outgoing, Notices, Triggers, Filters and Profiles. Each tab is also a page under
-FostercareBattleText in Game Menu > AddOn Options, in one column. See
+BattleText in Game Menu > AddOn Options, in one column. See
 [the user guide](docs/USER_GUIDE.md).
 
 Commands: `/fbt`, `/fbt enable`, `/fbt disable`, `/fbt version`, `/fbt reset`.
@@ -36,11 +36,11 @@ keep their own floating text. Combat text does not capture mouse input.
 
 ## For other addons
 
-`FostercareBattleText.DisplayMessage(text, displayType, sticky, r, g, b, size)`
-shows a line; `displayType` is `FostercareBattleText.DISPLAYTYPE_INCOMING`,
+`BattleText.DisplayMessage(text, displayType, sticky, r, g, b, size)`
+shows a line; `displayType` is `BattleText.DISPLAYTYPE_INCOMING`,
 `_OUTGOING` or `_NOTIFICATION`, and the colour channels are 0-255.
 
-While it is on, FostercareBattleText sets the client's combat log filter
+While it is on, BattleText sets the client's combat log filter
 (`CombatLogAddFilter`) to you and your pets, so the engine sends it only your
 own combat. That filter is shared: an addon that reads `COMBAT_LOG_EVENT` or
 the kept combat log entries sees it. `COMBAT_LOG_EVENT_UNFILTERED` is not

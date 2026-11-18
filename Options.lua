@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------------
--- FostercareBattleText: the settings window (ForgeUI) and its pages in AddOn Options.
+-- BattleText: the settings window (ForgeUI) and its pages in AddOn Options.
 -------------------------------------------------------------------------------------
 
 local addonName, FBT = ...
@@ -519,7 +519,7 @@ local function BuildGeneral(page)
  end), {before = 6, indent = 36})
 
  return function()
-  local enabledNow = not FostercareBattleTextDB.UserDisabled
+  local enabledNow = not BattleTextDB.UserDisabled
   UI.Sync(enabled, enabledNow)
   for key, widget in pairs(switches) do UI.Sync(widget, Profile()[key], enabledNow) end
   UI.Sync(gameDamage, Profile().ShowGameDamage, enabledNow)
@@ -1309,7 +1309,7 @@ local function BuildProfiles(page)
  end})
 
  return function()
-  local names = SortedKeys(FostercareBattleTextDB.Profiles)
+  local names = SortedKeys(BattleTextDB.Profiles)
   local offset = pager:Set(table.getn(names))
   for i, row in ipairs(rows) do
    local profileName = names[offset + i]
@@ -1373,7 +1373,7 @@ inlineEdit:Hide()
 panel:SetScript("OnShow", function() ShowTab(tab); pages[tab]:Show() end)
 panel:SetScript("OnHide", CloseExtras)
 
--- Game Menu > AddOn Options > FostercareBattleText (ClassicAPI): the same eight
+-- Game Menu > AddOn Options > BattleText (ClassicAPI): the same eight
 -- pages, one category each, in one column (ForgeLayout.lua).
 book = UI.Book({
  name = addonName, text = "Open a page under " .. addonName .. ", or type /fbt for the settings window.",
