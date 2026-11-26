@@ -1,0 +1,12 @@
+## Interface: 11200
+## Title: |cffff9e38BattleText|r |cffffd6a8[Fostercare5988]|r
+## Notes: Your fight as text that scrolls up beside your character, with a few short alerts
+## Author: Fostercare5988
+## X-Maintainer: Fostercare5988
+## Version: 1.0.0
+## SavedVariables: BattleTextDB
+## LoadSavedVariablesFirst: 1
+Core.lua
+Display.lua
+Combat.lua
+Notices.lua
